@@ -1,0 +1,12 @@
+# Core
+numpy
+pandas
+
+# Kaggle data/engine download + submission
+kaggle
+
+# RL stack (Phase 4) — uncomment as needed
+# torch
+# gymnasium
+# stable-baselines3   # PPO baseline
+# ray[rllib]          # scalable self-play, optional

@@ -1,0 +1,38 @@
+# DRAFT Dragapult ex deck — LEGAL (battle_start accepted), not yet tuned.
+# Built from the curated pool; flags verified against data/engine_cards.json.
+# ⚠️ ACE SPEC rule: max 1 per deck. In THIS environment the engine flags
+# Hyper Aroma, Prime Catcher, AND Maximum Belt as aceSpec (unlike real TCG) —
+# so we run exactly ONE: Prime Catcher. Always re-check aceSpec via engine data.
+#
+# Engine deck.csv = 60 raw card IDs; expand this (card_id,count) at submission.
+#
+# card_id,count,name
+# --- Pokémon (19) ---
+119,4,Dreepy
+120,3,Drakloak
+121,3,Dragapult ex
+131,2,Duskull
+132,2,Dusclops
+133,2,Dusknoir            # Cursed Blast: place 13 damage counters / turn
+235,1,Budew
+140,1,Fezandipiti ex      # draw off a KO
+112,1,Munkidori           # damage-counter manipulation
+# --- Supporters (10) ---
+1182,2,Boss's Orders      # gust the KO target
+1213,2,Judge              # hand disruption
+1199,2,Lacey
+1205,2,Cyrano
+1184,1,Lana's Aid
+1198,1,Crispin             # energy accel — VERIFY targets {R}/{P}
+# --- Items (20) ---
+1121,4,Ultra Ball
+1086,4,Buddy-Buddy Poffin
+1079,4,Rare Candy
+1122,4,Pokégear 3.0
+1097,3,Night Stretcher
+1088,1,Prime Catcher       # <-- the ONE ACE SPEC (gust)
+# --- Tools (2) ---
+1157,2,Rescue Board
+# --- Energy (9) ---
+5,5,Basic {P} Energy
+2,4,Basic {R} Energy

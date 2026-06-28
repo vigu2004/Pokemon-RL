@@ -1,0 +1,27 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.ipynb_checkpoints/
+
+# Kaggle credentials — NEVER commit
+kaggle.json
+.kaggle/
+
+# Large engine / data artifacts (keep CSV refs, ignore the heavy stuff)
+data/*.pdf
+engine/                 # native libs + sample agent; download via scripts/download_data.sh
+episodes/               # ~750MB/day ladder replay datasets
+*.tar.gz
+*.zip
+
+# Training artifacts
+checkpoints/
+runs/
+wandb/
+*.pt
+*.ckpt
+
+# Local env / secrets
+.env
+.python-version
