@@ -5,8 +5,11 @@ pandas
 # Kaggle data/engine download + submission
 kaggle
 
-# RL stack (Phase 4) — uncomment as needed
-# torch
+# RL stack
+torch                 # policy/value net + custom PPO self-play
+
+# Not used: the action space is a variable-length *set selection*, which doesn't
+# fit gym/SB3's fixed Discrete/Box spaces — we implement PPO directly (src/selfplay.py).
 # gymnasium
-# stable-baselines3   # PPO baseline
-# ray[rllib]          # scalable self-play, optional
+# stable-baselines3
+# ray[rllib]          # scalable self-play, optional (later)

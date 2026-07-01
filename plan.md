@@ -120,19 +120,22 @@ Components → files:
 - [x] Legal Dragapult deck (`battle_start` accepts it; 1 ACE SPEC).
 - [x] `scripts/smoke_test.py` runs a full random self-play game.
 
-### Phase 1 — Env + heuristic + first submission  ◀ NEXT
-- [ ] `src/env.py` — reset/step, legal-action plumbing, +1/−1 reward, game-over detect.
-- [ ] `src/agents/heuristic.py` — Dragapult turn logic; never crashes.
-- [ ] Eval harness: heuristic vs random over N games (target: ≫50% win).
-- [ ] `main.py` + packer → first **valid submission** on the leaderboard.
+### Phase 1 — Env + baselines + first submission
+- [x] `src/env.py` — `play_game` driver, legal-action plumbing, +1/−1 reward, game-over detect.
+- [x] `src/agents/baselines.py` — `RandomPolicy` + loop-safe `GreedyPolicy` (never crashes).
+- [x] Eval harness (`src/eval.py`): win rate + Wilson CI, side-swapped. Greedy beats
+      random **61.7%** in the mirror.
+- [ ] `main.py` + packer → first **valid submission** on the leaderboard (ship Greedy first).
 
-### Phase 2 — Learning substrate
-- [ ] `src/encode.py` — observation + per-option feature encoding.
-- [ ] `src/model.py` — policy/value net, masked head; sanity-train (behavior-clone heuristic).
+### Phase 2 — Learning substrate ✅ DONE
+- [x] `src/encode.py` — obs → state[174] + per-option features[n,86] (perspective-correct).
+- [x] `src/model.py` — policy/value net; variable-count masked action head (STOP-token
+      Plackett–Luce); log-prob recompute verified exact.
 
-### Phase 3 — Self-play RL
-- [ ] `src/selfplay.py` — PPO; league of checkpoints + heuristic.
-- [ ] North-star metric: win rate vs heuristic, tracked over hundreds of games.
+### Phase 3 — Self-play RL  ◀ IN PROGRESS
+- [x] `src/selfplay.py` — PPO; league of {random, greedy, frozen self-snapshots}.
+- [~] North-star metric: win rate vs random & greedy, tracked across iters (first run running).
+- [ ] Diverse opponent *decks* (currently mirror self-play only).
 
 ### Phase 4 — Search at inference
 - [ ] `src/search.py` — determinization + value-guided rollouts via `search_*`, time-budgeted.
@@ -159,5 +162,9 @@ Components → files:
 ---
 
 ## 6. Current status snapshot
-Phase 0 complete. Next concrete deliverables: `src/env.py` + `src/agents/heuristic.py`,
-then a first valid submission. Everything for Phases 2–4 plugs into that env.
+Phases 0–2 complete; Phase 3 (self-play PPO) in progress — the full learning stack
+(`env → agents → eval → encode → model → selfplay`) is built and a first training run
+is under way (`scripts/train.py`, checkpoints in `models/`). Next: read the first run's
+win-rate trend, then (a) first Greedy submission via `main.py`+packer, (b) determinized
+search at inference (Phase 4), (c) diverse opponent decks (Phase 5). See
+`docs/design_log.md` for the running journal.
