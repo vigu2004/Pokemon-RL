@@ -20,6 +20,66 @@ score).
 
 ---
 
+## 2026-07-02 — First run evaluated; ladder meta mined; meta league; FIRST SUBMISSION
+
+**First full training run: it learns.** The 200-iter mirror-league run finished.
+Checkpoint evaluated over 300 games/side (`eval_ckpt.py`): **vs Random 96.0%
+[93.1, 97.7], vs Greedy 80.5% [75.6, 84.6]**, zero aborts, avg 22 turns. The
+metrics trend is a clean learning curve (45%→95% vs Random, 20%→83% vs Greedy).
+Gotcha found: the engine import `os.chdir`s into `engine/`, so `eval_ckpt.py`
+with a *relative* checkpoint path resolves against `engine/` and dies — pass
+absolute paths.
+
+**Episodes = full replays, and we can read them.** Kaggle auth works with the
+new-style `~/.kaggle/access_token`. Daily datasets
+`kaggle/pokemon-tcg-ai-battle-episodes-YYYY-MM-DD` (~750MB zip, ~21.5GB raw,
+5–6k episodes/day, manifest in `...-episodes-index`). Each episode JSON has BOTH
+players' 60-card decks (step[1] actions), every decision's full obs (same schema
+as our engine wrapper: `current`/`select`/`logs`) + chosen indices, and final
+rewards. So: meta mining now, behavior cloning later, all offline.
+
+**Mined the 2026-07-01 day** (5,266 episodes, 125 teams) with the new
+`scripts/mine_episodes.py` (streams the zip, no extract). The live meta:
+Marnie's Grimmsnarl ex is the deck to beat (1,827 games, 55.8%; its +Fezandipiti
+variant 58.4% — best large-sample list), then Alakazam/Dudunsparce (1,648 @
+42.1% — popular but weak), Archaludon ex (1,630 @ 48.0%), Fezandipiti ex (1,351
+@ 44.9%), Cornerstone Ogerpon ex (679 @ **56.1%**), Mega Kangaskhan/Clefairy
+(542 @ 54.1%), Mega Starmie ex (527), Mega Lucario ex (400 @ 54.2%). Sobering:
+**Dragapult ex barely exists on the ladder (86 games) and wins 43.0%** — our
+deck list needs tuning even if the concept stays.
+
+**Meta league built and training resumed.** `scripts/make_meta_decks.py` exports
+the top-8 archetypes' best exact lists (real lists top teams piloted) to
+`deck/meta/*.csv`; all 8 verified engine-legal. `selfplay.py` league entries are
+now `(policy, opp_deck)` pairs and `train.py --opp-decks` adds Greedy piloting
+each meta deck; eval gained a **vs_meta** column. Resumed iter 200→400 with the
+8-deck league. First reads: vs Meta ~56–60% while mirror metrics hold (98%/81%)
+— cross-deck skill is now the thing being trained.
+
+**FIRST SUBMISSION shipped** to the Simulation ladder (2026-07-02, pending
+validation): `scripts/pack_submission.py` stages main.py + deck.csv + stripped
+model.pt + cg/ + src/ + data/, then validates in a clean subprocess (imports
+only the staged bundle, plays a full main-vs-main game through the real engine —
+any illegal selection raises), then tars (3.2MB). The agent
+(`src/submit/main.py`) is a fallback chain net→greedy→random with a contract
+sanitizer — it cannot crash and cannot return an illegal selection.
+`src/env.py` now supports both layouts (repo `engine/`, submission root `cg/`).
+
+**Facts pinned down:** Strategy track deadline **Sep 13 2026** ($240k, judged,
+no leaderboard); Simulation ladder ends Aug 16 2026 (~4k teams, top Elo ~1253).
+Competition data files were refreshed 2026-07-01; our card CSV is byte-identical,
+engine unchanged.
+
+**Next**
+- Read the 400-iter run: does vs_meta climb without mirror regressing?
+- Watch the first submission validate; then ship the meta-league checkpoint.
+- Behavior-clone from top teams' episodes (decks AND decisions are in the data)
+  — both as a warm-start comparison and as stronger league opponents.
+- Deck-list tuning against the mined meta (Dragapult's 43% ladder WR is a flag).
+- Determinized search at inference (Phase 4) — still the biggest untapped edge.
+
+---
+
 ## 2026-07-01 — Learning substrate: env, baselines, eval, encoder
 
 Goal for the session: *"start training the agent to play."* Training needs a

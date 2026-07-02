@@ -1,0 +1,19 @@
+# Meta deck: Archaludon ex
+# Mined from ladder episodes (episodes_2026-07-01.jsonl); archetype seen in 1630 games.
+# This exact list: 567 games, 49.6% win rate, teams: Takaaki Matsuda, CardPilotLab, wangyuou
+# card_id,count,name
+8,13  # Basic {M} Energy
+169,4  # Duraludon
+190,4  # Archaludon ex
+666,4  # Cinderace
+1097,4  # Night Stretcher
+1121,4  # Ultra Ball
+1122,4  # Pokégear 3.0
+1147,2  # Jumbo Ice Cream
+1152,4  # Poké Pad
+1159,1  # Hero’s Cape
+1182,1  # Boss’s Orders
+1185,4  # Explorer’s Guidance
+1197,3  # Xerosic’s Machinations
+1227,4  # Lillie's Determination
+1244,4  # Full Metal Lab

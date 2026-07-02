@@ -35,6 +35,9 @@ def main() -> None:
     ap.add_argument("--eval-every", type=int, default=10)
     ap.add_argument("--eval-games", type=int, default=100)
     ap.add_argument("--deck", default="dragapult_ex.draft")
+    ap.add_argument("--opp-decks", default=None,
+                    help="comma-separated deck names under deck/ (e.g. 'meta/gholdengo,"
+                         "meta/raging_bolt') added to the league piloted by Greedy")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default=None, help="checkpoint path (default models/<deck>.pt)")
     ap.add_argument("--resume", default=None,
@@ -42,6 +45,9 @@ def main() -> None:
     args = ap.parse_args()
 
     deck = load_deck(args.deck)
+    opp_decks = None
+    if args.opp_decks:
+        opp_decks = {name: load_deck(name) for name in args.opp_decks.split(",")}
     models = ROOT / "models"
     models.mkdir(exist_ok=True)
     # Resolve the checkpoint against the repo root — the engine chdirs the process
@@ -68,7 +74,7 @@ def main() -> None:
     if resume:
         print(f"Resuming from: {resume}")
     train(deck, cfg, ckpt_path=ckpt, metrics_path=metrics, resume_from=resume,
-          log=lambda m: print(m, flush=True))
+          opp_decks=opp_decks, log=lambda m: print(m, flush=True))
     print(f"Done. Checkpoint: {ckpt}")
 
 

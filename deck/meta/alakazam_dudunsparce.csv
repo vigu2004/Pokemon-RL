@@ -1,0 +1,23 @@
+# Meta deck: Alakazam / Dudunsparce
+# Mined from ladder episodes (episodes_2026-07-01.jsonl); archetype seen in 1648 games.
+# This exact list: 740 games, 43.9% win rate, teams: aidy, S4nkurero, pompom555
+# card_id,count,name
+5,3  # Basic {P} Energy
+13,1  # Enriching Energy
+19,4  # Telepath Psychic Energy
+66,3  # Dudunsparce
+305,4  # Dunsparce
+741,4  # Abra
+742,4  # Kadabra
+743,4  # Alakazam
+1079,4  # Rare Candy
+1081,4  # Enhanced Hammer
+1086,4  # Buddy-Buddy Poffin
+1097,3  # Night Stretcher
+1129,1  # Sacred Ash
+1152,4  # Poké Pad
+1182,3  # Boss’s Orders
+1184,1  # Lana’s Aid
+1225,4  # Hilda
+1231,4  # Dawn
+1264,1  # Battle Cage

@@ -53,14 +53,15 @@ class TrainConfig:
     device: str = "cpu"
 
 
-def _append_metrics(path: str, it: int, vs_random: float, vs_greedy: float) -> None:
+def _append_metrics(path: str, row: dict) -> None:
     """Append one eval row to a CSV, flushed immediately (survives a killed run)."""
     import os
     new = not os.path.exists(path)
     with open(path, "a") as f:
         if new:
-            f.write("iter,vs_random,vs_greedy\n")
-        f.write(f"{it},{vs_random:.4f},{vs_greedy:.4f}\n")
+            f.write(",".join(row.keys()) + "\n")
+        f.write(",".join(f"{v:.4f}" if isinstance(v, float) else str(v)
+                         for v in row.values()) + "\n")
         f.flush()
 
 
@@ -71,18 +72,24 @@ def _reward(winner: int, aborted: bool, learner_index: int) -> float:
 
 
 def collect_rollouts(net, encoder, deck, opponents, games, device, rng):
-    """Play `games` self-play games; return the learner's transitions with rewards."""
+    """Play `games` self-play games; return the learner's transitions with rewards.
+
+    ``opponents`` entries are ``(policy_factory, opp_deck)``; ``opp_deck=None``
+    means a mirror match (the opponent pilots our deck too).
+    """
     batch: list[dict] = []
     wins = losses = draws = 0
     for g in range(games):
         learner = NetPolicy(net, encoder, record=True, device=device)
-        opp = rng.choice(opponents)()
+        factory, opp_deck = rng.choice(opponents)
+        opp = factory()
+        opp_deck = opp_deck or deck
         learner_p0 = (g % 2 == 0)
         if learner_p0:
-            res = play_game(learner, opp, deck, deck)
+            res = play_game(learner, opp, deck, opp_deck)
             li = 0
         else:
-            res = play_game(opp, learner, deck, deck)
+            res = play_game(opp, learner, opp_deck, deck)
             li = 1
         r = _reward(res.winner, res.aborted, li)
         for t in learner.transitions:
@@ -139,7 +146,8 @@ def ppo_update(net, optimizer, batch, cfg: TrainConfig, rng):
 
 
 def train(deck, cfg: TrainConfig, log=print, ckpt_path: str | None = None,
-          metrics_path: str | None = None, resume_from: str | None = None):
+          metrics_path: str | None = None, resume_from: str | None = None,
+          opp_decks: dict[str, list[int]] | None = None):
     rng = random.Random(cfg.seed)
     torch.manual_seed(cfg.seed)
     np.random.seed(cfg.seed)
@@ -168,13 +176,17 @@ def train(deck, cfg: TrainConfig, log=print, ckpt_path: str | None = None,
             log("Nothing to do: checkpoint iter >= --iters. Raise --iters to train further.")
 
     # League: static baselines + frozen snapshots of past selves (added over time).
-    league = [lambda: RandomPolicy(), lambda: GreedyPolicy()]
+    # Entries are (policy_factory, opp_deck); opp_deck=None -> mirror match.
+    league = [(lambda: RandomPolicy(), None), (lambda: GreedyPolicy(), None)]
+    for name, odeck in (opp_decks or {}).items():
+        league.append((lambda: GreedyPolicy(), odeck))
+        log(f"League: + Greedy piloting {name} ({len(odeck)} cards)")
 
     def snapshot():
         frozen = copy.deepcopy(net).eval()
         for p in frozen.parameters():
             p.requires_grad_(False)
-        return lambda: NetPolicy(frozen, encoder, greedy=False, device=cfg.device)
+        return (lambda: NetPolicy(frozen, encoder, greedy=False, device=cfg.device), None)
 
     history = []
     for it in range(start_iter + 1, cfg.iters + 1):
@@ -193,12 +205,24 @@ def train(deck, cfg: TrainConfig, log=print, ckpt_path: str | None = None,
                                deck, deck, games=cfg.eval_games)
             vs_greedy = evaluate(lambda: NetPolicy(net, encoder, greedy=True), lambda: GreedyPolicy(),
                                  deck, deck, games=cfg.eval_games)
+            row = {"iter": it, "vs_random": vs_rand.win_rate,
+                   "vs_greedy": vs_greedy.win_rate}
             msg += (f"\n           EVAL  vs Random {vs_rand.win_rate:.1%}  "
                     f"vs Greedy {vs_greedy.win_rate:.1%}")
-            history.append({"iter": it, "vs_random": vs_rand.win_rate,
-                            "vs_greedy": vs_greedy.win_rate})
+            if opp_decks:
+                # Win rate vs Greedy piloting the meta decks, eval games split evenly.
+                per = max(2, cfg.eval_games // len(opp_decks))
+                w = g = 0
+                for odeck in opp_decks.values():
+                    r = evaluate(lambda: NetPolicy(net, encoder, greedy=True),
+                                 lambda: GreedyPolicy(), deck, odeck, games=per)
+                    w += r.wins
+                    g += r.games
+                row["vs_meta"] = w / max(g, 1)
+                msg += f"  vs Meta {row['vs_meta']:.1%}"
+            history.append(row)
             if metrics_path:
-                _append_metrics(metrics_path, it, vs_rand.win_rate, vs_greedy.win_rate)
+                _append_metrics(metrics_path, row)
 
         log(msg)
 

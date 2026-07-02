@@ -17,10 +17,14 @@ episodes/               # ~750MB/day ladder replay datasets
 
 # Training artifacts
 checkpoints/
+models/
 runs/
 wandb/
 *.pt
 *.ckpt
+
+# Submission staging (tarball already covered by *.tar.gz)
+build/
 
 # Local env / secrets
 .env
