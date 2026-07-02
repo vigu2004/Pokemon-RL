@@ -27,7 +27,9 @@ from pathlib import Path
 from typing import Callable
 
 ROOT = Path(__file__).resolve().parent.parent
-_ENGINE = ROOT / "engine"
+# Repo layout keeps the engine under engine/; the packed Kaggle submission has
+# the cg/ package at the agent root instead. Support both.
+_ENGINE = ROOT / "engine" if (ROOT / "engine").exists() else ROOT
 
 # The cg package loads its native lib and resolves relative paths against the cwd,
 # so it must be importable and we must run from engine/. Import lazily-safe here.

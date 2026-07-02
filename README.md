@@ -27,8 +27,17 @@ Pokémon TCG on the official simulator and is rated via automated ladder matches
 - [x] **Full learning stack built:** engine driver (`src/env.py`), baseline agents
       (`src/agents/`), win-rate eval (`src/eval.py`), feature encoder (`src/encode.py`),
       policy-value net (`src/model.py`), **self-play PPO** (`src/selfplay.py`).
-- [~] Self-play RL training runs (`scripts/train.py`) — tuning in progress.
-- [ ] First submission (`main.py` + packer); inference-time determinized search.
+- [x] First 200-iter run: **96.0% vs Random, 80.5% vs Greedy** (300 games each).
+- [x] **Episodes pipeline:** `scripts/mine_episodes.py` (daily ladder replays →
+      decks/results/meta report), `scripts/make_meta_decks.py` (top archetype
+      lists → `deck/meta/*.csv`); train vs them with `train.py --opp-decks ...`
+      (adds a `vs_meta` eval column).
+- [x] **Submission packer:** `scripts/pack_submission.py --ckpt models/<ckpt>.pt`
+      stages `src/submit/main.py` (net→greedy→random fallback chain) + deck +
+      stripped weights + `cg/`, validates a full game in a clean subprocess, tars.
+      First sim-ladder submission shipped 2026-07-02.
+- [~] Meta-league training (iters 200→400) running; inference-time determinized
+      search still to come.
 
 See `docs/design_log.md` for the running journal and `plan.md` for the roadmap.
 

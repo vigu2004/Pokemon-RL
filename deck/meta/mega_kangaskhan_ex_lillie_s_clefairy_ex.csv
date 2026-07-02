@@ -1,0 +1,25 @@
+# Meta deck: Mega Kangaskhan ex / Lillie’s Clefairy ex
+# Mined from ladder episodes (episodes_2026-07-01.jsonl); archetype seen in 542 games.
+# This exact list: 542 games, 54.1% win rate, teams: zoroark190
+# card_id,count,name
+3,2  # Basic {W} Energy
+4,4  # Basic {L} Energy
+5,4  # Basic {P} Energy
+6,2  # Basic {F} Energy
+108,2  # Wellspring Mask Ogerpon ex
+117,1  # Cornerstone Mask Ogerpon ex
+140,2  # Fezandipiti ex
+184,3  # Latias ex
+272,4  # Lillie’s Clefairy ex
+756,4  # Mega Kangaskhan ex
+957,1  # Miraidon ex
+1071,4  # Meowth ex
+1088,1  # Prime Catcher
+1102,4  # Dusk Ball
+1121,4  # Ultra Ball
+1146,3  # Wondrous Patch
+1172,2  # Lillie’s Pearl
+1182,3  # Boss’s Orders
+1198,4  # Crispin
+1205,2  # Cyrano
+1250,4  # Area Zero Underdepths
